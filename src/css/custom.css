@@ -1,0 +1,9 @@
+/*
+ * Custom CSS for styles that can't be handled by Tailwind CSS
+ * This file is intentionally minimal as most styles are now handled by Tailwind
+ */
+
+/* Custom CSS variables for complex gradients and shadows that are defined in Tailwind config */
+/* Most styles have been converted to Tailwind utilities */
+
+/* Placeholder for any future custom styles that can't be achieved with Tailwind */

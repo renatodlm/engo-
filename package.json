@@ -1,0 +1,31 @@
+{
+   "name": "cardbinder-game",
+   "version": "1.0.0",
+   "description": "Jogo de cartas para aprender inglês",
+   "main": "index.html",
+   "scripts": {
+      "dev": "npm run build:css && concurrently \"npm run watch:css\" \"node dev-server.js\"",
+      "build": "npm run build:css",
+      "build:css": "postcss src/css/input.css -o dist/styles.css",
+      "watch:css": "postcss src/css/input.css -o dist/styles.css --watch",
+      "start": "npm run build && node dev-server.js",
+      "serve": "node dev-server.js"
+   },
+   "devDependencies": {
+      "@tailwindcss/typography": "^0.5.10",
+      "autoprefixer": "^10.4.16",
+      "concurrently": "^8.2.2",
+      "live-server": "^1.2.2",
+      "postcss": "^8.4.31",
+      "postcss-cli": "^10.1.0",
+      "tailwindcss": "^3.3.0"
+   },
+   "keywords": [
+      "game",
+      "english",
+      "learning",
+      "cards"
+   ],
+   "author": "",
+   "license": "MIT"
+}

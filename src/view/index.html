@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Engo! English Game — V1</title>
+   <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="m-0 font-game bg-game-bg text-game-text"
+   style="background: radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.133), transparent), #0b1220;">
+   <div class="app grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 p-4 min-h-screen">
+      <header class="col-span-full flex items-center justify-between gap-3">
+         <h1 class="text-xl tracking-wide m-0 flex items-center gap-2.5">
+            Engo!
+            <span class="badge text-xs px-2 py-1 rounded-full bg-game-accent-gradient text-game-bg font-bold">
+               English — V1
+            </span>
+         </h1>
+         <div class="hud flex gap-2.5 items-center">
+            <div class="pill bg-game-panel px-3 py-2 rounded-xl shadow-game font-semibold text-game-text-2">
+               Rodada: <span id="round">1</span>/5
+            </div>
+            <div class="pill bg-game-panel px-3 py-2 rounded-xl shadow-game font-semibold text-game-text-2">
+               Rerolls: <span id="rerolls">2</span>
+            </div>
+            <div
+               class="pill timer bg-game-panel px-3 py-2 rounded-xl shadow-game font-semibold text-game-text-2 min-w-[84px] text-center"
+               id="timer">
+               ⏳ 20s
+            </div>
+            <button id="btnRoll"
+               class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-3.5 py-2.5 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+               Rolar
+            </button>
+            <button id="btnSubmit"
+               class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-3.5 py-2.5 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+               Enviar
+            </button>
+         </div>
+      </header>
+
+      <div class="layout grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
+         <section class="board bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game">
+            <div class="row flex gap-3 items-center flex-wrap">
+               <div class="flex-1">
+                  <div class="zone-title text-xs uppercase tracking-wider text-game-muted">
+                     Mão (arraste para segurar)
+                  </div>
+                  <div id="hand" class="hand flex gap-2.5 min-h-[132px] items-end flex-wrap"></div>
+               </div>
+            </div>
+            <div class="row flex gap-3 items-center flex-wrap mt-3.5">
+               <div class="flex-1">
+                  <div class="zone-title text-xs uppercase tracking-wider text-game-muted">
+                     Segurando (não será trocado ao rolar)
+                  </div>
+                  <div id="hold" class="hold flex gap-2.5 min-h-[90px] items-end flex-wrap"></div>
+               </div>
+            </div>
+            <div class="scores flex gap-2.5 mt-3">
+               <div class="score flex-1 bg-game-panel-2 border border-game-border rounded-xl p-2.5 text-center">
+                  <h3 class="my-0.5 mb-1.5 text-xs text-game-muted tracking-wide uppercase">Você</h3>
+                  <div class="big text-2xl font-black text-game-text" id="youScore">0</div>
+               </div>
+               <div class="score flex-1 bg-game-panel-2 border border-game-border rounded-xl p-2.5 text-center">
+                  <h3 class="my-0.5 mb-1.5 text-xs text-game-muted tracking-wide uppercase">Oponente</h3>
+                  <div class="big text-2xl font-black text-game-text" id="botScore">0</div>
+               </div>
+            </div>
+         </section>
+
+         <aside class="bg-game-panel-gradient border border-game-border rounded-2xl p-3.5 shadow-game">
+            <div class="side-title text-sm uppercase tracking-wider text-game-muted mb-2">
+               Objetivos & Progresso
+            </div>
+            <div id="combos"></div>
+            <div class="side-title text-sm uppercase tracking-wider text-game-muted mb-2 mt-3.5">
+               Nível
+            </div>
+            <select id="level"
+               class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-3.5 py-2.5 font-bold cursor-pointer shadow-game w-full">
+               <option value="A1">A1 (Iniciante)</option>
+               <option value="A2" selected>A2</option>
+               <option value="B1">B1</option>
+               <option value="B2">B2</option>
+               <option value="C1">C1</option>
+            </select>
+         </aside>
+      </div>
+   </div>
+
+   <script src="src/js/gameData.js"></script>
+   <script src="src/js/gameLogic.js"></script>
+</body>
+
+</html>
