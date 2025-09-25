@@ -4,3 +4,82 @@
 
 /* Import custom styles */
 @import './custom.css';
+
+/* Card animations */
+.card-drawing {
+   transform-style: preserve-3d;
+   backface-visibility: hidden;
+}
+
+.card-drawing::before {
+   content: '';
+   position: absolute;
+   inset: 0;
+   background: linear-gradient(135deg, #3b82f6, #1e40af);
+   border-radius: 0.5rem;
+   transform: rotateY(180deg);
+   backface-visibility: hidden;
+}
+
+/* Deck hover effect */
+.deck:hover {
+   transform: scale(1.05) rotate(-2deg);
+   transition: transform 0.2s ease;
+}
+
+/* Turn indicators */
+.player-turn {
+   box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+   border-color: rgb(34, 197, 94);
+}
+
+.opponent-turn {
+   box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+   border-color: rgb(239, 68, 68);
+}
+
+.player-turn-overlay {
+   background: rgba(34, 197, 94, 0.1);
+}
+
+.opponent-turn-overlay {
+   background: rgba(239, 68, 68, 0.1);
+}
+
+/* Turn transition effects */
+.turn-transition {
+   transition: all 0.5s ease;
+}
+
+.controls-disabled {
+   opacity: 0.5;
+   pointer-events: none;
+}
+
+/* Result modal animations */
+.fade-in {
+   opacity: 0;
+   animation: fadeIn 0.3s ease forwards;
+}
+
+.result-modal {
+   animation: slideUp 0.4s ease;
+}
+
+@keyframes fadeIn {
+   to {
+      opacity: 1;
+   }
+}
+
+@keyframes slideUp {
+   from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+   }
+
+   to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+   }
+}

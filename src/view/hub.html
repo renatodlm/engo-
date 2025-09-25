@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Engo! English Game — Hub</title>
+   <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="m-0 font-game bg-game-bg text-game-text"
+   style="background: radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.133), transparent), #0b1220;">
+
+   <div class="hub min-h-screen p-4 flex flex-col">
+      <header class="text-center mb-8">
+         <h1 class="text-4xl font-black text-game-text mb-2">
+            Engo!
+         </h1>
+         <p class="text-game-muted text-lg">
+            Aprenda inglês jogando cartas
+         </p>
+      </header>
+
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto w-full">
+         <!-- Seção de Modos de Jogo -->
+         <section class="bg-game-panel-gradient border border-game-border rounded-2xl p-6 shadow-game">
+            <h2 class="text-2xl font-bold text-game-text mb-6 text-center">
+               🆚 Modos de Jogo
+            </h2>
+
+            <div class="space-y-4">
+               <div
+                  class="game-mode bg-game-panel border border-game-border rounded-xl p-4 hover:border-game-accent transition-colors cursor-pointer"
+                  data-mode="single-player">
+                  <div class="flex items-center gap-4">
+                     <div class="text-3xl">🤖</div>
+                     <div class="flex-1">
+                        <h3 class="text-lg font-bold text-game-text">Vs Máquina</h3>
+                        <p class="text-sm text-game-muted">Enfrente oponentes controlados por IA</p>
+                     </div>
+                     <div class="text-2xl">→</div>
+                  </div>
+               </div>
+
+               <div
+                  class="game-mode bg-game-panel border border-game-border rounded-xl p-4 opacity-50 cursor-not-allowed"
+                  data-mode="multiplayer">
+                  <div class="flex items-center gap-4">
+                     <div class="text-3xl">👥</div>
+                     <div class="flex-1">
+                        <h3 class="text-lg font-bold text-game-text">Vs Jogador</h3>
+                        <p class="text-sm text-game-muted">Jogue com outros jogadores (em breve)</p>
+                     </div>
+                     <div class="text-2xl">🔒</div>
+                  </div>
+               </div>
+            </div>
+         </section>
+
+         <!-- Seção de Oponentes/Missões -->
+         <section class="bg-game-panel-gradient border border-game-border rounded-2xl p-6 shadow-game">
+            <h2 class="text-2xl font-bold text-game-text mb-6 text-center" id="opponentsTitle">
+               🤖 Oponentes Disponíveis
+            </h2>
+
+            <div id="opponentsList" class="space-y-3">
+               <!-- Os oponentes serão carregados dinamicamente -->
+            </div>
+         </section>
+      </div>
+
+      <!-- Estatísticas do Jogador -->
+      <section
+         class="bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game mt-8 max-w-4xl mx-auto w-full">
+         <h3 class="text-xl font-bold text-game-text mb-4 text-center">
+            📊 Suas Estatísticas
+         </h3>
+
+         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="stat bg-game-panel border border-game-border rounded-xl p-3">
+               <div class="text-2xl font-black text-game-accent" id="totalGames">0</div>
+               <div class="text-xs text-game-muted uppercase tracking-wide">Jogos</div>
+            </div>
+            <div class="stat bg-game-panel border border-game-border rounded-xl p-3">
+               <div class="text-2xl font-black text-game-good" id="totalWins">0</div>
+               <div class="text-xs text-game-muted uppercase tracking-wide">Vitórias</div>
+            </div>
+            <div class="stat bg-game-panel border border-game-border rounded-xl p-3">
+               <div class="text-2xl font-black text-game-bad" id="totalLosses">0</div>
+               <div class="text-xs text-game-muted uppercase tracking-wide">Derrotas</div>
+            </div>
+            <div class="stat bg-game-panel border border-game-border rounded-xl p-3">
+               <div class="text-2xl font-black text-game-text" id="currentStreak">0</div>
+               <div class="text-xs text-game-muted uppercase tracking-wide">Sequência</div>
+            </div>
+         </div>
+      </section>
+   </div>
+
+   <script src="src/js/gameData.js"></script>
+   <script src="src/js/hubLogic.js"></script>
+</body>
+
+</html>

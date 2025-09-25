@@ -2,8 +2,7 @@
 
 // ======= Game State =======
 let deck = [];
-let hand = [];
-let hold = [];
+let hand = []; // Todas as cartas ficam na hand, algumas são locked
 let round = 1;
 let maxRounds = GAME_CONFIG.maxRounds;
 let rerolls = GAME_CONFIG.initialRerolls;
@@ -11,6 +10,8 @@ let timer = GAME_CONFIG.roundTimer;
 let tHandle = null;
 let youScore = 0;
 let botScore = 0;
+let currentTurn = 'player'; // 'player' or 'opponent'
+let gamePhase = 'playing'; // 'playing', 'opponent_turn', 'player_turn'
 
 // ======= Helper Functions =======
 function shuffle(a) {
@@ -21,9 +22,150 @@ function shuffle(a) {
    return a;
 }
 
+// ======= Sound System =======
+function playSound(soundName) {
+   // TODO: Implementar sistema de som
+   // Você pode usar Web Audio API ou Audio objects
+   // Exemplo:
+   // const audio = new Audio(`sounds/${soundName}.mp3`);
+   // audio.play().catch(e => console.log('Audio play failed:', e));
+
+   console.log(`🎵 Playing sound: ${soundName}`);
+   // Sugestões de sons para implementar:
+   // - card_flip: virar carta
+   // - card_lock: travar/destravar carta
+   // - roll_dice: rolar dados/cartas
+   // - player_turn: vez do jogador
+   // - opponent_turn: vez do oponente
+   // - victory: vitória
+   // - defeat: derrota
+   // - level_up: subir de nível
+   // - button_click: clique em botão
+}
+
+// ======= Progress Management =======
+function loadPlayerProgress() {
+   const progress = JSON.parse(localStorage.getItem('engo_progress') || '{}');
+   return {
+      totalGames: progress.totalGames || 0,
+      totalWins: progress.totalWins || 0,
+      totalLosses: progress.totalLosses || 0,
+      currentStreak: progress.currentStreak || 0,
+      defeatedOpponents: progress.defeatedOpponents || [],
+      unlockedOpponents: progress.unlockedOpponents || ['beginner', 'student']
+   };
+}
+
+function savePlayerProgress(progress) {
+   localStorage.setItem('engo_progress', JSON.stringify(progress));
+}
+
+function saveGameResult(didWin, opponentId) {
+   const progress = loadPlayerProgress();
+
+   progress.totalGames++;
+
+   if (didWin) {
+      progress.totalWins++;
+      progress.currentStreak++;
+      if (!progress.defeatedOpponents.includes(opponentId)) {
+         progress.defeatedOpponents.push(opponentId);
+      }
+   } else {
+      progress.totalLosses++;
+      progress.currentStreak = 0;
+   }
+
+   savePlayerProgress(progress);
+}
+
 function freshDeck(level) {
    const lvls = levelOrder(level); // include <= selected
-   return shuffle(WORDS.filter(x => lvls.includes(x.lvl))).slice();
+   let availableWords = WORDS.filter(x => lvls.includes(x.lvl));
+
+   // Remover cartas que já foram usadas hoje
+   const today = new Date().toDateString();
+   const usedCards = JSON.parse(localStorage.getItem('engo_used_cards_' + today) || '[]');
+
+   availableWords = availableWords.filter(word => !usedCards.includes(word.w));
+
+   // Se não há cartas suficientes, resetar as usadas hoje
+   if (availableWords.length < GAME_CONFIG.handSize * 2) {
+      localStorage.removeItem('engo_used_cards_' + today);
+      availableWords = WORDS.filter(x => lvls.includes(x.lvl));
+   }
+
+   return shuffle(availableWords).slice();
+}
+
+function markCardAsUsed(card) {
+   const today = new Date().toDateString();
+   const usedCards = JSON.parse(localStorage.getItem('engo_used_cards_' + today) || '[]');
+
+   if (!usedCards.includes(card.w)) {
+      usedCards.push(card.w);
+      localStorage.setItem('engo_used_cards_' + today, JSON.stringify(usedCards));
+   }
+}
+
+// ======= Turn Management =======
+function setPlayerTurn() {
+   currentTurn = 'player';
+   gamePhase = 'player_turn';
+
+   // Visual indicators
+   document.querySelector('.center-panel').classList.add('player-turn-overlay', 'turn-transition');
+   document.querySelector('.center-panel').classList.remove('opponent-turn-overlay');
+
+   document.querySelector('.left-panel').classList.add('player-turn', 'turn-transition');
+   document.querySelector('.left-panel').classList.remove('opponent-turn');
+
+   document.querySelector('.controls').classList.remove('controls-disabled');
+
+   // Som de turno do jogador
+   playSound('player_turn');
+}
+
+function setOpponentTurn() {
+   currentTurn = 'opponent';
+   gamePhase = 'opponent_turn';
+
+   // Visual indicators
+   document.querySelector('.center-panel').classList.add('opponent-turn-overlay', 'turn-transition');
+   document.querySelector('.center-panel').classList.remove('player-turn-overlay');
+
+   document.querySelector('.right-panel').classList.add('opponent-turn', 'turn-transition');
+   document.querySelector('.right-panel').classList.remove('player-turn');
+
+   document.querySelector('.controls').classList.add('controls-disabled');
+
+   // Som de turno do oponente
+   playSound('opponent_turn');
+}
+
+function showTurnModal(turnType, callback) {
+   const modal = el('div', 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50');
+   modal.innerHTML = `
+      <div class="bg-game-panel-gradient border border-game-border rounded-2xl p-8 shadow-game text-center max-w-md mx-4">
+         <div class="text-6xl mb-4">${turnType === 'player' ? '🎯' : '🤖'}</div>
+         <h2 class="text-2xl font-black text-game-text mb-2">
+            ${turnType === 'player' ? 'Sua Vez!' : 'Vez do Oponente!'}
+         </h2>
+         <p class="text-game-muted">
+            ${turnType === 'player' ? 'Faça sua jogada!' : 'O oponente está pensando...'}
+         </p>
+      </div>
+   `;
+
+   document.body.appendChild(modal);
+
+   // Som do modal de turno
+   playSound('turn_modal');
+
+   setTimeout(() => {
+      modal.remove();
+      if (callback) callback();
+   }, 3000);
 }
 
 function levelOrder(level) {
@@ -86,96 +228,169 @@ function el(tag, cls) {
 }
 
 // ======= DOM Elements =======
-let handEl, holdEl, combosEl;
+let handEl, playerCombosEl, opponentCombosEl;
 
 function initializeDOM() {
    handEl = q('#hand');
-   holdEl = q('#hold');
-   combosEl = q('#combos');
+   playerCombosEl = q('#playerCombos');
+   opponentCombosEl = q('#opponentCombos');
 }
 
 // ======= UI Rendering =======
 function renderCards() {
-   [handEl, holdEl].forEach(z => z.innerHTML = '');
-   hand.forEach((c, i) => handEl.appendChild(cardEl(c, i, false)));
-   hold.forEach((c, i) => holdEl.appendChild(cardEl(c, i, true)));
-   updateCombos();
+   handEl.innerHTML = '';
+   hand.forEach((c, i) => handEl.appendChild(cardEl(c, i, c.locked || false)));
+   updatePlayerCombos();
+   updateOpponentCombos();
 }
 
-function cardEl(card, idx, isHeld) {
+function animateCardDraw(cardElement, index) {
+   // Animação de virar carta do deck
+   cardElement.classList.add('card-drawing');
+
+   // Posiciona a carta inicialmente no deck
+   const deckRect = q('#deck').getBoundingClientRect();
+   const handRect = handEl.getBoundingClientRect();
+
+   cardElement.style.position = 'fixed';
+   cardElement.style.left = deckRect.left + 'px';
+   cardElement.style.top = deckRect.top + 'px';
+   cardElement.style.zIndex = '1000';
+   cardElement.style.transform = 'rotateY(180deg) scale(0.8)';
+
+   // Anima para a posição final na mão
+   setTimeout(() => {
+      const finalLeft = handRect.left + (index * 120) + 'px';
+      const finalTop = handRect.top + 'px';
+
+      cardElement.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      cardElement.style.left = finalLeft;
+      cardElement.style.top = finalTop;
+      cardElement.style.transform = 'rotateY(0deg) scale(1)';
+
+      // Remove estilos temporários após animação
+      setTimeout(() => {
+         cardElement.style.position = '';
+         cardElement.style.left = '';
+         cardElement.style.top = '';
+         cardElement.style.zIndex = '';
+         cardElement.style.transition = '';
+         cardElement.style.transform = '';
+         cardElement.classList.remove('card-drawing');
+      }, 600);
+   }, 100);
+}
+
+function renderCardsWithAnimation(newCards = []) {
+   const existingCards = hand.length - newCards.length;
+   handEl.innerHTML = '';
+
+   hand.forEach((c, i) => {
+      const cardElement = cardEl(c, i, c.locked || false);
+
+      if (i >= existingCards) {
+         // Esta é uma carta nova - anima
+         handEl.appendChild(cardElement);
+         animateCardDraw(cardElement, i);
+      } else {
+         // Carta existente - apenas adiciona
+         handEl.appendChild(cardElement);
+      }
+   });
+
+   updatePlayerCombos();
+   updateOpponentCombos();
+}
+
+function cardEl(card, idx, isLocked) {
    const wrap = el('div', 'card animate-deal-in w-28 h-40 relative');
-   wrap.draggable = true;
-   wrap.dataset.held = isHeld ? 1 : 0;
+   wrap.draggable = !isLocked; // Cartas travadas não podem ser arrastadas
+   wrap.dataset.locked = isLocked ? 1 : 0;
    wrap.dataset.index = idx;
 
    wrap.addEventListener('dragstart', ev => {
-      ev.dataTransfer.setData('text/plain', JSON.stringify({ held: isHeld, idx }));
+      if (isLocked) {
+         ev.preventDefault(); // Impede drag de cartas travadas
+         return;
+      }
+      ev.dataTransfer.setData('text/plain', JSON.stringify({ locked: isLocked, idx }));
       wrap.classList.add('opacity-75');
    });
 
    wrap.addEventListener('dragend', () => wrap.classList.remove('opacity-75'));
-   wrap.addEventListener('dblclick', () => toggleHold(isHeld, idx));
+   wrap.addEventListener('dblclick', () => toggleLock(idx));
 
-   const inner = el('div', 'inner absolute inset-0 bg-game-card-gradient rounded-2xl border border-game-border-2 shadow-game-card p-2.5 flex flex-col gap-1.5 transition-all duration-300 hover:shadow-game-card-hover');
+   // Design de carta de baralho
+   const inner = el('div', 'inner absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-xl border-2 border-gray-300 shadow-lg p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:scale-105');
 
-   const top = el('div', 'tag text-xs font-bold text-game-text-3 opacity-90');
-   top.textContent = POS_LABEL[card.pos] || card.pos;
+   // Efeito visual de carta travada
+   if (isLocked) {
+      inner.classList.add('ring-2', 'ring-yellow-400', 'ring-offset-2', 'ring-offset-game-bg');
+      inner.style.filter = 'brightness(1.1) saturate(1.2)';
 
-   const word = el('div', 'word text-lg font-extrabold leading-tight text-game-text');
-   word.textContent = card.w;
-
-   const lvl = el('div', 'level mt-auto text-xs text-game-text-5 opacity-80');
-   lvl.textContent = 'Nível ' + card.lvl;
-
-   inner.appendChild(top);
-   inner.appendChild(word);
-   inner.appendChild(lvl);
-   wrap.appendChild(inner);
-
-   if (isHeld) {
-      wrap.classList.add('outline-2', 'outline-game-accent', 'outline-offset-2', 'outline');
+      // Ícone de cadeado
+      const lockIcon = el('div', 'absolute top-1 right-1 text-yellow-600 text-lg font-bold');
+      lockIcon.textContent = '🔒';
+      lockIcon.style.filter = 'drop-shadow(0 0 2px rgba(0,0,0,0.5))';
+      inner.appendChild(lockIcon);
    }
+
+   // Parte superior - tipo gramatical e nível
+   const header = el('div', 'flex justify-between items-start mb-2');
+   const top = el('div', 'tag text-xs font-bold text-gray-700 bg-gray-200 px-2 py-1 rounded');
+   top.textContent = POS_LABEL[card.pos] || card.pos;
+   header.appendChild(top);
+
+   const lvl = el('div', 'level text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded');
+   lvl.textContent = card.lvl;
+   header.appendChild(lvl);
+   inner.appendChild(header);
+
+   // Centro - símbolo representativo do tipo gramatical
+   const symbolContainer = el('div', 'flex-1 flex items-center justify-center mb-2');
+   const symbol = el('div', 'text-4xl opacity-80');
+   symbol.textContent = getPosSymbol(card.pos);
+   symbolContainer.appendChild(symbol);
+   inner.appendChild(symbolContainer);
+
+   // Parte inferior - palavra
+   const wordContainer = el('div', 'text-center');
+   const word = el('div', 'word text-lg font-black text-gray-800 leading-tight');
+   word.textContent = card.w;
+   wordContainer.appendChild(word);
+   inner.appendChild(wordContainer);
+
+   wrap.appendChild(inner);
 
    return wrap;
 }
 
+function getPosSymbol(pos) {
+   const symbols = {
+      'noun': '🏠',      // Casa para substantivos
+      'verb': '🏃',      // Pessoa correndo para verbos
+      'adjective': '✨', // Brilho para adjetivos
+      'adverb': '💨',   // Vento para advérbios
+      'pronoun': '👤',  // Pessoa para pronomes
+      'preposition': '🌉', // Ponte para preposições
+      'conjunction': '🔗', // Elo para conjunções
+      'interjection': '💥' // Explosão para interjeições
+   };
+   return symbols[pos] || '❓';
+}
+
 // ======= Drag & Drop =======
 function setupDragAndDrop() {
-   [handEl, holdEl].forEach(zone => {
-      zone.addEventListener('dragover', ev => {
-         ev.preventDefault();
-         zone.classList.add('border-dashed', 'border-blue-400', 'rounded-xl', 'p-1.5');
-      });
-
-      zone.addEventListener('dragleave', () => {
-         zone.classList.remove('border-dashed', 'border-blue-400', 'rounded-xl', 'p-1.5');
-      });
-
-      zone.addEventListener('drop', ev => {
-         ev.preventDefault();
-         zone.classList.remove('border-dashed', 'border-blue-400', 'rounded-xl', 'p-1.5');
-         const data = JSON.parse(ev.dataTransfer.getData('text/plain'));
-         moveCard(data.held, data.idx, zone === holdEl);
-      });
-   });
+   // Drag and drop foi removido - agora usamos apenas double-click para travar/destravar cartas
+   // O sistema antigo movia cartas entre containers, agora elas ficam travadas no lugar
 }
 
-function moveCard(fromHeld, idx, toHeld) {
-   if (fromHeld === toHeld) return;
-
-   if (fromHeld) {
-      const [c] = hold.splice(idx, 1);
-      hand.push(c);
-   } else {
-      const [c] = hand.splice(idx, 1);
-      hold.push(c);
-   }
-
+function toggleLock(idx) {
+   hand[idx].locked = !hand[idx].locked;
    renderCards();
-}
 
-function toggleHold(isHeld, idx) {
-   moveCard(isHeld, idx, !isHeld);
+   // Som de travar/destravar carta
+   playSound('card_lock_toggle');
 }
 
 // ======= Combos Sidebar =======
@@ -184,14 +399,13 @@ function filteredObjectives() {
    return OBJECTIVES.filter(o => o.levels.includes(lv));
 }
 
-function updateCombos() {
+function updateCombos(containerEl, cards, isPlayer = true) {
    const objs = filteredObjectives();
-   combosEl.innerHTML = '';
-   const all = [...hand, ...hold];
+   containerEl.innerHTML = '';
 
    objs.forEach(o => {
-      const ok = o.req(all);
-      const p = o.prog(all);
+      const ok = o.req(cards);
+      const p = o.prog(cards);
 
       const box = el('div', 'combo bg-game-panel border border-game-border rounded-xl p-2.5 mb-2.5');
 
@@ -216,8 +430,20 @@ function updateCombos() {
 
       bar.appendChild(fill);
       box.appendChild(bar);
-      combosEl.appendChild(box);
+      containerEl.appendChild(box);
    });
+}
+
+function updatePlayerCombos() {
+   const playerCards = hand.filter(card => !card.locked); // Apenas cartas não travadas contam para combos
+   updateCombos(playerCombosEl, playerCards, true);
+}
+
+function updateOpponentCombos() {
+   // Por enquanto, oponente tem cartas aleatórias simuladas
+   // Isso será melhorado quando implementarmos a lógica do oponente
+   const opponentCards = draw(5); // Simula 5 cartas do oponente
+   updateCombos(opponentCombosEl, opponentCards, false);
 }
 
 // ======= Game Flow =======
@@ -227,10 +453,17 @@ function startRound() {
    updateHUD();
    deck = freshDeck(q('#level').value);
    hand = draw(GAME_CONFIG.handSize);
-   hold = [];
-   renderCards();
+
+   // Marcar cartas iniciais como usadas hoje
+   hand.forEach(card => markCardAsUsed(card));
+
+   renderCardsWithAnimation(hand); // Anima todas as cartas iniciais
    enableActions(true);
    startTimer();
+
+   // Começar com turno do jogador
+   setPlayerTurn();
+   showTurnModal('player');
 }
 
 function enableActions(play) {
@@ -259,18 +492,42 @@ function startTimer() {
 function roll() {
    if (rerolls <= 0) return;
 
-   // replace non-held cards
-   const keep = hold.slice();
-   const need = GAME_CONFIG.handSize - keep.length;
-   hand = draw(need);
-   hold = keep;
+   // Substituir apenas cartas não travadas
+   const newHand = [];
+   const newCards = [];
+
+   hand.forEach(card => {
+      if (card.locked) {
+         newHand.push(card); // Manter carta travada
+      } else {
+         // Precisamos de uma nova carta aqui
+         if (deck.length > 0) {
+            const newCard = deck.pop();
+            newHand.push(newCard);
+            newCards.push(newCard);
+         } else {
+            // Se não há cartas no deck, manter a carta existente
+            newHand.push(card);
+         }
+      }
+   });
+
+   hand = newHand;
    rerolls--;
    updateHUD();
-   renderCards();
+
+   // Renderizar com animação das novas cartas
+   renderCardsWithAnimation(newCards);
+
+   // Marcar cartas novas como usadas hoje
+   newCards.forEach(card => markCardAsUsed(card));
 
    if (rerolls <= 0) {
       q('#btnRoll').disabled = true;
    }
+
+   // Som de rolar cartas
+   playSound('card_roll');
 }
 
 function scoreFor(arr) {
@@ -323,43 +580,127 @@ function submit() {
    enableActions(false);
    clearInterval(tHandle);
 
-   const all = [...hand, ...hold];
+   // Calcular pontuação do jogador
+   const all = hand.filter(card => !card.locked); // Apenas cartas não travadas contam
    const { total, hits } = scoreFor(all);
    youScore += total;
    q('#youScore').textContent = youScore;
 
-   // Bot
-   const bot = simulateBot();
-   botScore += bot;
-   q('#botScore').textContent = botScore;
-
    // Toast-like feedback
-   const msg = `Você marcou +${total} (${hits.join(', ') || 'sem objetivos'}). Oponente fez +${bot}.`;
+   const msg = `Você marcou +${total} (${hits.join(', ') || 'sem objetivos'}).`;
    flash(msg);
 
-   // advance
+   // Passar para turno do oponente
+   setOpponentTurn();
+   showTurnModal('opponent', () => {
+      // Simular turno do oponente
+      simulateOpponentTurn();
+   });
+}
+
+function simulateOpponentTurn() {
+   // Simular tempo de pensamento do oponente
    setTimeout(() => {
-      if (round >= maxRounds) {
-         endGame();
-      } else {
-         round++;
-         startRound();
-      }
-   }, 900);
+      const bot = simulateBot();
+      botScore += bot;
+      q('#botScore').textContent = botScore;
+
+      // Toast-like feedback
+      const msg = `Oponente marcou +${bot}.`;
+      flash(msg);
+
+      // Voltar para turno do jogador
+      setTimeout(() => {
+         if (round >= maxRounds) {
+            endGame();
+         } else {
+            round++;
+            startRound();
+         }
+      }, 2000);
+   }, 2000); // Simular 2 segundos de "pensamento"
 }
 
 function endGame() {
-   const res = youScore === botScore ? 'Empate!' :
-      (youScore > botScore ? 'Você venceu! 🏆' : 'Você perdeu 😿');
-   flash(`Fim de jogo — ${res}  Placar ${youScore} x ${botScore}`);
+   const didWin = youScore > botScore;
+   const isDraw = youScore === botScore;
 
-   // reset for a new session
+   // Salvar resultado no progresso
+   const selectedOpponent = JSON.parse(localStorage.getItem('engo_selected_opponent') || '{}');
+   if (selectedOpponent.id) {
+      saveGameResult(didWin, selectedOpponent.id);
+   }
+
+   // Mostrar modal de resultado
+   showGameResultModal(didWin, isDraw, youScore, botScore);
+}
+
+function showGameResultModal(didWin, isDraw, playerScore, opponentScore) {
+   const modal = el('div', 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 fade-in');
+   modal.innerHTML = `
+      <div class="bg-game-panel-gradient border border-game-border rounded-2xl p-8 shadow-game text-center max-w-md mx-4 result-modal">
+         <div class="text-6xl mb-4">
+            ${isDraw ? '🤝' : didWin ? '🏆' : '😿'}
+         </div>
+         <h2 class="text-3xl font-black text-game-text mb-2">
+            ${isDraw ? 'Empate!' : didWin ? 'Vitória!' : 'Derrota!'}
+         </h2>
+         <div class="text-xl text-game-muted mb-6">
+            ${isDraw ? 'Foi um jogo equilibrado!' : didWin ? 'Parabéns! Você venceu!' : 'Não desanime! Tente novamente!'}
+         </div>
+
+         <div class="scores bg-game-panel border border-game-border rounded-xl p-4 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+               <div class="text-center">
+                  <div class="text-lg font-bold text-game-text">Você</div>
+                  <div class="text-3xl font-black ${didWin ? 'text-game-good' : 'text-game-muted'}">${playerScore}</div>
+               </div>
+               <div class="text-center">
+                  <div class="text-lg font-bold text-game-text">Oponente</div>
+                  <div class="text-3xl font-black ${!didWin && !isDraw ? 'text-game-bad' : 'text-game-muted'}">${opponentScore}</div>
+               </div>
+            </div>
+         </div>
+
+         <div class="flex gap-3">
+            <button id="btnPlayAgain" class="flex-1 btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-4 py-3 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90">
+               🎮 Jogar Novamente
+            </button>
+            <button id="btnBackToHub" class="flex-1 btn appearance-none border-0 bg-game-panel text-game-text-2 rounded-xl px-4 py-3 font-semibold cursor-pointer shadow-game transition-all duration-200 hover:bg-game-panel-2">
+               🏠 Voltar ao Hub
+            </button>
+         </div>
+      </div>
+   `;
+
+   document.body.appendChild(modal);
+
+   // Animação de fade in
+   setTimeout(() => modal.classList.add('opacity-100'), 100);
+
+   // Event listeners
+   modal.querySelector('#btnPlayAgain').addEventListener('click', () => {
+      playSound('button_click');
+      modal.remove();
+      resetGame();
+   });
+
+   modal.querySelector('#btnBackToHub').addEventListener('click', () => {
+      playSound('button_click');
+      window.location.href = '/';
+   });
+
+   // Som de vitória/derrota
+   playSound(isDraw ? 'draw' : didWin ? 'victory' : 'defeat');
+}
+
+function resetGame() {
    round = 1;
    youScore = 0;
    botScore = 0;
-   startRound();
    q('#youScore').textContent = 0;
    q('#botScore').textContent = 0;
+   startRound();
 }
 
 function flash(text) {
@@ -374,8 +715,18 @@ function flash(text) {
 
 // ======= Event Listeners =======
 function setupEventListeners() {
-   q('#btnRoll').addEventListener('click', roll);
-   q('#btnSubmit').addEventListener('click', submit);
+   q('#btnBackToHub').addEventListener('click', () => {
+      playSound('button_click');
+      window.location.href = '/';
+   });
+   q('#btnRoll').addEventListener('click', () => {
+      playSound('button_click');
+      roll();
+   });
+   q('#btnSubmit').addEventListener('click', () => {
+      playSound('button_click');
+      submit();
+   });
    q('#level').addEventListener('change', () => {
       startRound();
    });
@@ -388,6 +739,71 @@ function initializeGame() {
    setupEventListeners();
    startRound();
 }
+
+// ======= Multiplayer Preparation (WebSocket) =======
+/*
+// Estrutura preparada para implementação futura de multiplayer com WebSocket
+// Quando implementar, substitua o código atual por este sistema
+
+let ws = null;
+let gameRoom = null;
+let isHost = false;
+
+function initializeWebSocket() {
+   // TODO: Implementar conexão WebSocket
+   // ws = new WebSocket('ws://localhost:8080');
+   // ws.onmessage = handleWebSocketMessage;
+   // ws.onclose = handleDisconnect;
+}
+
+function handleWebSocketMessage(event) {
+   const data = JSON.parse(event.data);
+
+   switch(data.type) {
+      case 'game_start':
+         // Iniciar jogo multiplayer
+         break;
+      case 'opponent_move':
+         // Processar movimento do oponente
+         break;
+      case 'game_end':
+         // Finalizar jogo
+         break;
+   }
+}
+
+function sendWebSocketMessage(type, payload) {
+   if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type, payload, room: gameRoom }));
+   }
+}
+
+function createGameRoom() {
+   // TODO: Implementar criação de sala
+   gameRoom = 'room_' + Date.now();
+   isHost = true;
+   // sendWebSocketMessage('create_room', { roomId: gameRoom });
+}
+
+function joinGameRoom(roomId) {
+   // TODO: Implementar entrada em sala
+   gameRoom = roomId;
+   isHost = false;
+   // sendWebSocketMessage('join_room', { roomId });
+}
+
+function sendGameMove(moveData) {
+   // TODO: Enviar movimento para o oponente
+   // sendWebSocketMessage('game_move', moveData);
+}
+
+// Para usar multiplayer futuramente:
+// 1. Implementar servidor WebSocket (Node.js + ws ou Socket.io)
+// 2. Descomentar as funções acima
+// 3. Modificar submit() para enviar movimentos via WebSocket
+// 4. Modificar startRound() para esperar sinal do servidor
+// 5. Adicionar UI para criar/entrar em salas
+*/
 
 // Start the game when DOM is loaded
 if (document.readyState === 'loading') {

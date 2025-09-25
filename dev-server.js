@@ -40,7 +40,11 @@ const server = http.createServer((req, res) => {
    let filePath = '.' + req.url;
 
    if (filePath === './') {
-      filePath = './src/view/index.html';
+      filePath = './src/view/hub.html'; // Hub é sempre a página inicial
+   }
+
+   if (req.url === '/game') {
+      filePath = './src/view/index.html'; // Jogo é acessado via /game
    }
 
    if (req.url.startsWith('/src/')) {
