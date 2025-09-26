@@ -73,7 +73,57 @@ const WORDS = [
    { w: 'meticulous', pos: 'adj', lvl: 'C1' }, { w: 'pragmatic', pos: 'adj', lvl: 'C1' }, { w: 'ubiquitous', pos: 'adj', lvl: 'C1' },
    { w: 'ostensibly', pos: 'adv', lvl: 'C1' }, { w: 'inherently', pos: 'adv', lvl: 'C1' }, { w: 'predominantly', pos: 'adv', lvl: 'C1' },
    { w: 'notwithstanding', pos: 'prep', lvl: 'C1' }, { w: 'irrespective', pos: 'prep', lvl: 'C1' }, { w: 'albeit', pos: 'conj', lvl: 'C1' },
-   { w: 'whereupon', pos: 'adv', lvl: 'C1' }, { w: 'hitherto', pos: 'adv', lvl: 'C1' }, { w: 'forthwith', pos: 'adv', lvl: 'C1' }
+   { w: 'whereupon', pos: 'adv', lvl: 'C1' }, { w: 'hitherto', pos: 'adv', lvl: 'C1' }, { w: 'forthwith', pos: 'adv', lvl: 'C1' },
+
+   // Palavras adicionais para garantir variedade (A1-A2 extras)
+   { w: 'apple', pos: 'noun', lvl: 'A1' }, { w: 'tree', pos: 'noun', lvl: 'A1' }, { w: 'sun', pos: 'noun', lvl: 'A1' },
+   { w: 'moon', pos: 'noun', lvl: 'A1' }, { w: 'star', pos: 'noun', lvl: 'A1' }, { w: 'door', pos: 'noun', lvl: 'A1' },
+   { w: 'window', pos: 'noun', lvl: 'A1' }, { w: 'chair', pos: 'noun', lvl: 'A1' }, { w: 'table', pos: 'noun', lvl: 'A1' },
+   { w: 'phone', pos: 'noun', lvl: 'A1' }, { w: 'computer', pos: 'noun', lvl: 'A1' }, { w: 'pen', pos: 'noun', lvl: 'A1' },
+   { w: 'paper', pos: 'noun', lvl: 'A1' }, { w: 'money', pos: 'noun', lvl: 'A1' }, { w: 'game', pos: 'noun', lvl: 'A1' },
+   { w: 'come', pos: 'verb', lvl: 'A1' }, { w: 'look', pos: 'verb', lvl: 'A1' }, { w: 'see', pos: 'verb', lvl: 'A1' },
+   { w: 'hear', pos: 'verb', lvl: 'A1' }, { w: 'walk', pos: 'verb', lvl: 'A1' }, { w: 'stand', pos: 'verb', lvl: 'A1' },
+   { w: 'sit', pos: 'verb', lvl: 'A1' }, { w: 'buy', pos: 'verb', lvl: 'A1' }, { w: 'sell', pos: 'verb', lvl: 'A1' },
+   { w: 'open', pos: 'verb', lvl: 'A1' }, { w: 'close', pos: 'verb', lvl: 'A1' }, { w: 'give', pos: 'verb', lvl: 'A1' },
+   { w: 'take', pos: 'verb', lvl: 'A1' }, { w: 'put', pos: 'verb', lvl: 'A1' }, { w: 'get', pos: 'verb', lvl: 'A1' },
+   { w: 'green', pos: 'adj', lvl: 'A1' }, { w: 'blue', pos: 'adj', lvl: 'A1' }, { w: 'red', pos: 'adj', lvl: 'A1' },
+   { w: 'yellow', pos: 'adj', lvl: 'A1' }, { w: 'black', pos: 'adj', lvl: 'A1' }, { w: 'white', pos: 'adj', lvl: 'A1' },
+   { w: 'long', pos: 'adj', lvl: 'A1' }, { w: 'short', pos: 'adj', lvl: 'A1' }, { w: 'tall', pos: 'adj', lvl: 'A1' },
+   { w: 'wide', pos: 'adj', lvl: 'A1' }, { w: 'narrow', pos: 'adj', lvl: 'A1' }, { w: 'thick', pos: 'adj', lvl: 'A1' },
+   { w: 'thin', pos: 'adj', lvl: 'A1' }, { w: 'heavy', pos: 'adj', lvl: 'A1' }, { w: 'light', pos: 'adj', lvl: 'A1' },
+
+   // A2 extras
+   { w: 'person', pos: 'noun', lvl: 'A2' }, { w: 'place', pos: 'noun', lvl: 'A2' }, { w: 'thing', pos: 'noun', lvl: 'A2' },
+   { w: 'idea', pos: 'noun', lvl: 'A2' }, { w: 'number', pos: 'noun', lvl: 'A2' }, { w: 'part', pos: 'noun', lvl: 'A2' },
+   { w: 'world', pos: 'noun', lvl: 'A2' }, { w: 'hand', pos: 'noun', lvl: 'A2' }, { w: 'eye', pos: 'noun', lvl: 'A2' },
+   { w: 'face', pos: 'noun', lvl: 'A2' }, { w: 'way', pos: 'noun', lvl: 'A2' }, { w: 'case', pos: 'noun', lvl: 'A2' },
+   { w: 'question', pos: 'noun', lvl: 'A2' }, { w: 'answer', pos: 'noun', lvl: 'A2' }, { w: 'story', pos: 'noun', lvl: 'A2' },
+   { w: 'feel', pos: 'verb', lvl: 'A2' }, { w: 'think', pos: 'verb', lvl: 'A2' }, { w: 'know', pos: 'verb', lvl: 'A2' },
+   { w: 'learn', pos: 'verb', lvl: 'A2' }, { w: 'teach', pos: 'verb', lvl: 'A2' }, { w: 'study', pos: 'verb', lvl: 'A2' },
+   { w: 'listen', pos: 'verb', lvl: 'A2' }, { w: 'speak', pos: 'verb', lvl: 'A2' }, { w: 'ask', pos: 'verb', lvl: 'A2' },
+   { w: 'answer', pos: 'verb', lvl: 'A2' }, { w: 'tell', pos: 'verb', lvl: 'A2' }, { w: 'show', pos: 'verb', lvl: 'A2' },
+
+   // B1 extras para garantir 100+ cartas
+   { w: 'understand', pos: 'verb', lvl: 'B1' }, { w: 'explain', pos: 'verb', lvl: 'B1' }, { w: 'decide', pos: 'verb', lvl: 'B1' },
+   { w: 'choose', pos: 'verb', lvl: 'B1' }, { w: 'change', pos: 'verb', lvl: 'B1' }, { w: 'turn', pos: 'verb', lvl: 'B1' },
+   { w: 'build', pos: 'verb', lvl: 'B1' }, { w: 'break', pos: 'verb', lvl: 'B1' }, { w: 'fix', pos: 'verb', lvl: 'B1' },
+   { w: 'carry', pos: 'verb', lvl: 'B1' }, { w: 'bring', pos: 'verb', lvl: 'B1' }, { w: 'send', pos: 'verb', lvl: 'B1' },
+
+   // Mais palavras para completar 110+ cartas
+   { w: 'receive', pos: 'verb', lvl: 'B1' }, { w: 'offer', pos: 'verb', lvl: 'B1' }, { w: 'accept', pos: 'verb', lvl: 'B1' },
+   { w: 'refuse', pos: 'verb', lvl: 'B1' }, { w: 'agree', pos: 'verb', lvl: 'B1' }, { w: 'disagree', pos: 'verb', lvl: 'B1' },
+   { w: 'join', pos: 'verb', lvl: 'B1' }, { w: 'leave', pos: 'verb', lvl: 'B1' }, { w: 'arrive', pos: 'verb', lvl: 'B1' },
+   { w: 'depart', pos: 'verb', lvl: 'B1' }, { w: 'visit', pos: 'verb', lvl: 'B1' }, { w: 'return', pos: 'verb', lvl: 'B1' },
+
+   { w: 'strong', pos: 'adj', lvl: 'A2' }, { w: 'weak', pos: 'adj', lvl: 'A2' }, { w: 'rich', pos: 'adj', lvl: 'A2' },
+   { w: 'poor', pos: 'adj', lvl: 'A2' }, { w: 'smart', pos: 'adj', lvl: 'A2' }, { w: 'silly', pos: 'adj', lvl: 'A2' },
+   { w: 'funny', pos: 'adj', lvl: 'A2' }, { w: 'serious', pos: 'adj', lvl: 'A2' }, { w: 'quiet', pos: 'adj', lvl: 'A2' },
+   { w: 'loud', pos: 'adj', lvl: 'A2' }, { w: 'clean', pos: 'adj', lvl: 'A2' }, { w: 'dirty', pos: 'adj', lvl: 'A2' },
+
+   { w: 'always', pos: 'adv', lvl: 'A2' }, { w: 'never', pos: 'adv', lvl: 'A2' }, { w: 'sometimes', pos: 'adv', lvl: 'A2' },
+   { w: 'often', pos: 'adv', lvl: 'A2' }, { w: 'rarely', pos: 'adv', lvl: 'A2' }, { w: 'today', pos: 'adv', lvl: 'A2' },
+   { w: 'tomorrow', pos: 'adv', lvl: 'A2' }, { w: 'yesterday', pos: 'adv', lvl: 'A2' }, { w: 'now', pos: 'adv', lvl: 'A2' },
+   { w: 'later', pos: 'adv', lvl: 'A2' }, { w: 'early', pos: 'adv', lvl: 'A2' }, { w: 'late', pos: 'adv', lvl: 'A2' }
 ];
 
 const POS_LABEL = {
@@ -93,6 +143,7 @@ const OBJECTIVES = [
       levels: ['A1', 'A2'],
       label: '2 Verbos',
       weight: 1,
+      tooltip: 'Colete 2 cartas de verbos (palavras de ação como "correr", "comer", etc.)',
       req: (h) => count(h, 'verb') >= 2,
       prog: (h) => Math.min(count(h, 'verb') / 2, 1)
    },
@@ -101,6 +152,7 @@ const OBJECTIVES = [
       levels: ['A1', 'A2'],
       label: '2 Substantivos',
       weight: 1,
+      tooltip: 'Colete 2 cartas de substantivos (coisas, pessoas, lugares como "casa", "gato", etc.)',
       req: (h) => count(h, 'noun') >= 2,
       prog: (h) => Math.min(count(h, 'noun') / 2, 1)
    },
@@ -109,6 +161,7 @@ const OBJECTIVES = [
       levels: ['A1', 'A2', 'B1'],
       label: 'Verbo + Substantivo',
       weight: 1,
+      tooltip: 'Tenha pelo menos 1 verbo e 1 substantivo juntos. Base de uma frase simples!',
       req: (h) => count(h, 'verb') >= 1 && count(h, 'noun') >= 1,
       prog: (h) => Math.min(((count(h, 'verb') > 0 ? 1 : 0) + (count(h, 'noun') > 0 ? 1 : 0)) / 2, 1)
    },
@@ -117,6 +170,7 @@ const OBJECTIVES = [
       levels: ['A2', 'B1'],
       label: '3 do mesmo tipo',
       weight: 2,
+      tooltip: 'Colete 3 cartas do mesmo tipo gramatical (ex: 3 verbos ou 3 adjetivos)',
       req: (h) => hasAtLeast(h, 3),
       prog: (h) => Math.min(bestOfSame(h) / 3, 1)
    },
@@ -126,6 +180,7 @@ const OBJECTIVES = [
       levels: ['B1', 'B2'],
       label: '4 do mesmo tipo',
       weight: 3,
+      tooltip: 'Desafio maior: colete 4 cartas do mesmo tipo gramatical!',
       req: (h) => hasAtLeast(h, 4),
       prog: (h) => Math.min(bestOfSame(h) / 4, 1)
    },
@@ -134,6 +189,7 @@ const OBJECTIVES = [
       levels: ['B1', 'B2', 'C1'],
       label: 'Sujeito + Verbo + Objeto',
       weight: 3,
+      tooltip: 'Monte uma frase completa: 1 verbo + 2 substantivos (um como sujeito, outro como objeto)',
       req: (h) => count(h, 'verb') >= 1 && count(h, 'noun') >= 2,
       prog: (h) => Math.min((Math.min(count(h, 'verb'), 1) + Math.min(count(h, 'noun'), 2)) / 3, 1)
    },
@@ -142,6 +198,7 @@ const OBJECTIVES = [
       levels: ['B1', 'B2'],
       label: '2 Preposições',
       weight: 2,
+      tooltip: 'Colete 2 preposições (palavras que conectam como "em", "sobre", "com", etc.)',
       req: (h) => count(h, 'prep') >= 2,
       prog: (h) => Math.min(count(h, 'prep') / 2, 1)
    },
@@ -151,6 +208,7 @@ const OBJECTIVES = [
       levels: ['C1'],
       label: 'Full House (3+2 POS)',
       weight: 4,
+      tooltip: 'Como no poker: 3 cartas de um tipo + 2 cartas de outro tipo (ex: 3 verbos + 2 substantivos)',
       req: (h) => isFullHouse(h),
       prog: (h) => fullHouseProg(h)
    },
@@ -159,6 +217,7 @@ const OBJECTIVES = [
       levels: ['C1'],
       label: 'Arco-íris (5 tipos diferentes)',
       weight: 5,
+      tooltip: 'Desafio supremo: tenha pelo menos 1 carta de 5 tipos gramaticais diferentes!',
       req: (h) => distinctPOS(h) >= 5,
       prog: (h) => Math.min(distinctPOS(h) / 5, 1)
    }
@@ -166,8 +225,8 @@ const OBJECTIVES = [
 
 // Game Configuration
 const GAME_CONFIG = {
-   maxRounds: 5,
-   initialRerolls: 2,
+   maxRounds: 10,
+   initialRerolls: 5,
    roundTimer: 20, // seconds
    handSize: 5
 };

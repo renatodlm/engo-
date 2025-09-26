@@ -12,6 +12,7 @@ let youScore = 0;
 let botScore = 0;
 let currentTurn = 'player'; // 'player' or 'opponent'
 let gamePhase = 'playing'; // 'playing', 'opponent_turn', 'player_turn'
+let playerReady = false; // Controla se o jogador está pronto para começar o round
 
 // ======= Helper Functions =======
 function shuffle(a) {
@@ -265,10 +266,10 @@ function animateCardDraw(cardElement, index) {
       const finalLeft = handRect.left + (index * 120) + 'px';
       const finalTop = handRect.top + 'px';
 
-      cardElement.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      cardElement.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
       cardElement.style.left = finalLeft;
       cardElement.style.top = finalTop;
-      cardElement.style.transform = 'rotateY(0deg) scale(1)';
+      cardElement.style.transform = 'rotateY(0deg) scale(1) rotateZ(0deg)';
 
       // Remove estilos temporários após animação
       setTimeout(() => {
@@ -279,7 +280,8 @@ function animateCardDraw(cardElement, index) {
          cardElement.style.transition = '';
          cardElement.style.transform = '';
          cardElement.classList.remove('card-drawing');
-      }, 600);
+         cardElement.classList.add('card-flip'); // Adiciona animação de flip final
+      }, 300);
    }, 100);
 }
 
@@ -345,11 +347,14 @@ function cardEl(card, idx, isLocked) {
    header.appendChild(lvl);
    inner.appendChild(header);
 
-   // Centro - símbolo representativo do tipo gramatical
-   const symbolContainer = el('div', 'flex-1 flex items-center justify-center mb-2');
-   const symbol = el('div', 'text-4xl opacity-80');
+   // Centro - símbolo representativo do tipo gramatical + emote
+   const symbolContainer = el('div', 'flex-1 flex items-center justify-center mb-2 relative');
+   const symbol = el('div', 'text-5xl opacity-40 absolute inset-0 flex items-center justify-center z-0');
    symbol.textContent = getPosSymbol(card.pos);
+   const emote = el('div', 'text-2xl opacity-70 z-10 relative');
+   emote.textContent = getPosEmote(card.pos);
    symbolContainer.appendChild(symbol);
+   symbolContainer.appendChild(emote);
    inner.appendChild(symbolContainer);
 
    // Parte inferior - palavra
@@ -366,16 +371,30 @@ function cardEl(card, idx, isLocked) {
 
 function getPosSymbol(pos) {
    const symbols = {
-      'noun': '🏠',      // Casa para substantivos
-      'verb': '🏃',      // Pessoa correndo para verbos
-      'adjective': '✨', // Brilho para adjetivos
-      'adverb': '💨',   // Vento para advérbios
-      'pronoun': '👤',  // Pessoa para pronomes
-      'preposition': '🌉', // Ponte para preposições
-      'conjunction': '🔗', // Elo para conjunções
+      'noun': '🌟',      // Estrela para substantivos
+      'verb': '🚀',      // Foguete para verbos
+      'adj': '💎',      // Diamante para adjetivos
+      'adv': '⚡',      // Raio para advérbios
+      'pron': '👑',     // Coroa para pronomes
+      'prep': '🌈',     // Arco-íris para preposições
+      'conj': '🔥',     // Fogo para conjunções
       'interjection': '💥' // Explosão para interjeições
    };
    return symbols[pos] || '❓';
+}
+
+function getPosEmote(pos) {
+   const emotes = {
+      'noun': '😊',      // Rostinho alegre para substantivos
+      'verb': '😎',      // Óculos escuros para verbos
+      'adj': '🤩',      // Olhos de estrela para adjetivos
+      'adv': '😜',      // Língua de fora para advérbios
+      'pron': '🥰',     // Apaixonado para pronomes
+      'prep': '😉',     // Piscadinha para preposições
+      'conj': '🤪',     // Maluco para conjunções
+      'interjection': '😱' // Surpreso para interjeições
+   };
+   return emotes[pos] || '🙂';
 }
 
 // ======= Drag & Drop =======
@@ -410,8 +429,9 @@ function updateCombos(containerEl, cards, isPlayer = true) {
 
       const head = el('div', 'combo-head flex justify-between gap-2 font-bold');
 
-      const title = el('div', 'text-game-text');
+      const title = el('div', 'text-game-text cursor-help');
       title.textContent = o.label;
+      title.title = o.tooltip || '';  // Tooltip nativo do browser
 
       const stat = el('div', 'text-sm');
       stat.innerHTML = ok ?
@@ -449,6 +469,7 @@ function updateOpponentCombos() {
 function startRound() {
    rerolls = GAME_CONFIG.initialRerolls;
    timer = GAME_CONFIG.roundTimer;
+   playerReady = false;
    updateHUD();
    deck = freshDeck(q('#level').value);
    hand = draw(GAME_CONFIG.handSize);
@@ -458,7 +479,7 @@ function startRound() {
 
    renderCardsWithAnimation(hand); // Anima todas as cartas iniciais
    enableActions(true);
-   startTimer();
+   showReadyButton(); // Mostra botão "Estou Pronto" ao invés de iniciar timer
 
    // Começar com turno do jogador
    setPlayerTurn();
@@ -466,14 +487,14 @@ function startRound() {
 }
 
 function enableActions(play) {
-   q('#btnRoll').disabled = !play;
-   q('#btnSubmit').disabled = !play;
+   q('#btnRoll').disabled = !play || !playerReady;
+   q('#btnSubmit').disabled = !play || !playerReady;
 }
 
 function updateHUD() {
    q('#round').textContent = round;
    q('#rerolls').textContent = rerolls;
-   q('#timer').textContent = `⏳ ${timer}s`;
+   q('#timer').textContent = playerReady ? `⏳ ${timer}s` : '⏸️ Aguardando...';
 }
 
 function startTimer() {
@@ -486,6 +507,38 @@ function startTimer() {
          submit();
       }
    }, 1000);
+}
+
+function showReadyButton() {
+   // Criar overlay com botão "Estou Pronto"
+   const overlay = el('div', 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ready-overlay');
+
+   const modal = el('div', 'bg-game-panel-gradient border border-game-border rounded-2xl p-8 shadow-game text-center max-w-md mx-4');
+
+   const title = el('h3', 'text-2xl font-bold text-game-text mb-4');
+   title.textContent = `Rodada ${round}`;
+
+   const message = el('p', 'text-game-muted mb-6');
+   message.textContent = currentTurn === 'player' ?
+      'Suas cartas foram distribuídas! Clique quando estiver pronto para iniciar o cronômetro.' :
+      'Aguarde ambos os jogadores ficarem prontos...';
+
+   const readyBtn = el('button', 'px-6 py-3 bg-game-accent-gradient text-game-bg font-bold rounded-xl hover:scale-105 transition-transform');
+   readyBtn.textContent = '🚀 Estou Pronto!';
+
+   readyBtn.addEventListener('click', () => {
+      playerReady = true;
+      document.body.removeChild(overlay);
+      enableActions(true); // Reabilita ações agora que está pronto
+      startTimer(); // Inicia o timer
+      playSound('player_ready');
+   });
+
+   modal.appendChild(title);
+   modal.appendChild(message);
+   modal.appendChild(readyBtn);
+   overlay.appendChild(modal);
+   document.body.appendChild(overlay);
 }
 
 function roll() {

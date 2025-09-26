@@ -37,12 +37,24 @@ module.exports = {
             'game-card-hover': '0 18px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.09)',
          },
          animation: {
-            'deal-in': 'dealIn 0.35s ease both',
+            'deal-in': 'dealIn 0.2s ease both',
+            'card-flip': 'cardFlip 0.4s ease both',
+            'card-draw': 'cardDraw 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
          },
          keyframes: {
             dealIn: {
                'from': { transform: 'translateY(-14px) scale(0.98)', opacity: '0' },
                'to': { transform: 'translateY(0) scale(1)', opacity: '1' }
+            },
+            cardFlip: {
+               '0%': { transform: 'rotateY(180deg) scale(0.8)' },
+               '50%': { transform: 'rotateY(90deg) scale(0.9)' },
+               '100%': { transform: 'rotateY(0deg) scale(1)' }
+            },
+            cardDraw: {
+               '0%': { transform: 'rotateY(180deg) scale(0.8) rotateZ(5deg)', opacity: '0.8' },
+               '50%': { transform: 'rotateY(90deg) scale(0.95) rotateZ(2deg)', opacity: '0.9' },
+               '100%': { transform: 'rotateY(0deg) scale(1) rotateZ(0deg)', opacity: '1' }
             }
          },
          backgroundImage: {
