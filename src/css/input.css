@@ -9,6 +9,7 @@
 .card-drawing {
    transform-style: preserve-3d;
    backface-visibility: hidden;
+   transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .card-drawing::before {
@@ -16,9 +17,10 @@
    position: absolute;
    inset: 0;
    background: linear-gradient(135deg, #3b82f6, #1e40af);
-   border-radius: 0.5rem;
+   border-radius: 0.75rem;
    transform: rotateY(180deg);
    backface-visibility: hidden;
+   z-index: -1;
 }
 
 /* Deck hover effect */
@@ -63,6 +65,12 @@
 }
 
 .result-modal {
+   animation: slideUp 0.4s ease;
+   background: rgba(0, 0, 0, 0.9);
+   backdrop-filter: blur(4px);
+}
+
+.turn-modal {
    animation: slideUp 0.4s ease;
 }
 

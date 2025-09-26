@@ -46,8 +46,8 @@ module.exports = {
             }
          },
          backgroundImage: {
-            'game-gradient': 'radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.133), transparent)',
-            'game-panel-gradient': 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005))',
+            'game-gradient': 'radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.4), transparent)',
+            'game-panel-gradient': 'linear-gradient(180deg, #111a2e, #0f1830), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005))',
             'game-card-gradient': 'linear-gradient(180deg, #213057, #162346)',
             'game-btn-gradient': 'linear-gradient(180deg, #2a3a72, #1a2550)',
             'game-accent-gradient': 'linear-gradient(90deg, #6ee7ff, #a78bfa)',

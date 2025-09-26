@@ -144,9 +144,10 @@ function setOpponentTurn() {
 }
 
 function showTurnModal(turnType, callback) {
-   const modal = el('div', 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50');
-   modal.innerHTML = `
-      <div class="bg-game-panel-gradient border border-game-border rounded-2xl p-8 shadow-game text-center max-w-md mx-4">
+   const overlay = el('div', 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 fade-in');
+   overlay.innerHTML = `
+      <div class="bg-game-panel-gradient border border-game-border rounded-2xl p-8 shadow-game text-center max-w-md mx-4 turn-modal">
+      <div class="flex flex-col items-center justify-center">
          <div class="text-6xl mb-4">${turnType === 'player' ? '🎯' : '🤖'}</div>
          <h2 class="text-2xl font-black text-game-text mb-2">
             ${turnType === 'player' ? 'Sua Vez!' : 'Vez do Oponente!'}
@@ -154,16 +155,17 @@ function showTurnModal(turnType, callback) {
          <p class="text-game-muted">
             ${turnType === 'player' ? 'Faça sua jogada!' : 'O oponente está pensando...'}
          </p>
+         </div>
       </div>
    `;
 
-   document.body.appendChild(modal);
+   document.body.appendChild(overlay);
 
    // Som do modal de turno
    playSound('turn_modal');
 
    setTimeout(() => {
-      modal.remove();
+      overlay.remove();
       if (callback) callback();
    }, 3000);
 }
@@ -282,19 +284,16 @@ function animateCardDraw(cardElement, index) {
 }
 
 function renderCardsWithAnimation(newCards = []) {
-   const existingCards = hand.length - newCards.length;
    handEl.innerHTML = '';
 
    hand.forEach((c, i) => {
       const cardElement = cardEl(c, i, c.locked || false);
+      handEl.appendChild(cardElement);
 
-      if (i >= existingCards) {
-         // Esta é uma carta nova - anima
-         handEl.appendChild(cardElement);
+      // Anima apenas cartas novas que não estão locked
+      const isNewCard = newCards.some(newCard => newCard.w === c.w && newCard.pos === c.pos);
+      if (isNewCard && !c.locked) {
          animateCardDraw(cardElement, i);
-      } else {
-         // Carta existente - apenas adiciona
-         handEl.appendChild(cardElement);
       }
    });
 
@@ -318,7 +317,7 @@ function cardEl(card, idx, isLocked) {
    });
 
    wrap.addEventListener('dragend', () => wrap.classList.remove('opacity-75'));
-   wrap.addEventListener('dblclick', () => toggleLock(idx));
+   wrap.addEventListener('click', () => toggleLock(idx));
 
    // Design de carta de baralho
    const inner = el('div', 'inner absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-xl border-2 border-gray-300 shadow-lg p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:scale-105');
