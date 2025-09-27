@@ -719,6 +719,12 @@ function renderCards() {
 }
 
 function animateCardDraw(cardElement, index) {
+   // Verificar se a carta está travada antes de animar
+   const isLocked = cardElement.dataset.locked === '1';
+   if (isLocked) {
+      return; // Cartas travadas nunca devem ser animadas
+   }
+
    // Animação de virar carta do deck
    cardElement.classList.add('card-drawing');
 
@@ -833,6 +839,12 @@ function renderCardsWithAnimation(newCards = []) {
 
 function flipAllCardsTogether(cardElements) {
    cardElements.forEach(cardElement => {
+      // Verificar se a carta está travada antes de girar
+      const isLocked = cardElement.dataset.locked === '1';
+      if (isLocked) {
+         return; // Pular cartas travadas - elas nunca devem girar
+      }
+
       const card3D = cardElement.querySelector('.card-3d');
       const front = cardElement.querySelector('.card-front');
       const back = cardElement.querySelector('.card-back');
@@ -870,7 +882,7 @@ function cardEl(card, idx, isLocked) {
    // Container 3D para flip
    const card3D = el('div', 'card-3d relative w-full h-full');
    card3D.style.transformStyle = 'preserve-3d';
-   card3D.style.transition = 'transform 0.4s linear';
+   card3D.style.transition = isLocked ? 'none' : 'transform 0.4s linear'; // Sem transição para cartas travadas
 
    // Design de carta de baralho - FRENTE
    const front = el('div', 'card-front absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 shadow-xl p-3 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:scale-105');
@@ -975,8 +987,8 @@ function setupDragAndDrop() {
 function toggleLock(idx) {
    hand[idx].locked = !hand[idx].locked;
 
-   // Encontrar a carta específica no DOM e atualizar apenas ela
-   const cardElement = handEl.children[idx];
+   // Encontrar a carta específica no DOM pelo data-index
+   const cardElement = handEl.querySelector(`[data-index="${idx}"]`);
    if (cardElement) {
       // Atualizar o estado visual da carta
       cardElement.dataset.locked = hand[idx].locked ? 1 : 0;
@@ -989,10 +1001,7 @@ function toggleLock(idx) {
 
       if (front && back && card3D) {
          if (hand[idx].locked) {
-            // Carta travada: mostrar frente, esconder fundo
             front.style.display = 'flex';
-            back.style.display = 'none';
-            card3D.style.transform = 'rotateY(0deg)';
 
             // Adicionar borda de destaque
             front.classList.add('ring-2', 'ring-yellow-400', 'ring-offset-2', 'ring-offset-game-bg');
@@ -1005,10 +1014,8 @@ function toggleLock(idx) {
                front.appendChild(lockIcon);
             }
          } else {
-            // Carta não travada: esconder frente, mostrar fundo
-            front.style.display = 'none';
+            // Carta não travada: esconder frente, mostrar fundo (sem animação)
             back.style.display = 'flex';
-            card3D.style.transform = 'rotateY(180deg)';
 
             // Remover borda de destaque
             front.classList.remove('ring-2', 'ring-yellow-400', 'ring-offset-2', 'ring-offset-game-bg');
