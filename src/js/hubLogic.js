@@ -106,6 +106,68 @@ function updateOpponentUnlocks() {
    savePlayerProgress(progress);
 }
 
+// ======= Tutorial System =======
+function renderTutorialGrid() {
+   const tutorialGrid = q('#tutorialGrid');
+   if (!tutorialGrid) return;
+
+   // Agrupar objetivos por nível para melhor organização
+   const objectivesByLevel = {
+      'A1-A2': OBJECTIVES.filter(o => o.levels.includes('A1') || o.levels.includes('A2')),
+      'B1-B2': OBJECTIVES.filter(o => o.levels.includes('B1') || o.levels.includes('B2')),
+      'C1': OBJECTIVES.filter(o => o.levels.includes('C1'))
+   };
+
+   tutorialGrid.innerHTML = '';
+
+   Object.entries(objectivesByLevel).forEach(([levelGroup, objectives]) => {
+      objectives.forEach(objective => {
+         const tutorialCard = createTutorialCard(objective, levelGroup);
+         tutorialGrid.appendChild(tutorialCard);
+      });
+   });
+}
+
+function createTutorialCard(objective, levelGroup) {
+   // Cores por nível de dificuldade
+   const levelColors = {
+      'A1-A2': { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', color: '#22c55e' },
+      'B1-B2': { bg: 'rgba(251, 191, 36, 0.1)', border: 'rgba(251, 191, 36, 0.3)', color: '#fbbf24' },
+      'C1': { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', color: '#ef4444' }
+   };
+
+   const colors = levelColors[levelGroup] || levelColors['A1-A2'];
+
+   // Usar createCard reutilizável
+   const header = `
+      <div class="flex justify-between items-center mb-2">
+         <span class="px-2 py-1 rounded text-xs font-bold" style="background: ${colors.bg}; border: 1px solid ${colors.border}; color: ${colors.color};">
+            ${levelGroup}
+         </span>
+         <span class="text-xs text-game-accent font-bold">até 16pts</span>
+      </div>
+   `;
+
+   const footer = `
+      <div class="flex justify-between items-center text-xs mt-3 pt-3 border-t border-game-border">
+         <span class="text-game-accent opacity-70">🎥 Vídeo disponível</span>
+         <span class="text-game-muted opacity-50">Clique para detalhes</span>
+      </div>
+   `;
+
+   const tutorialCard = createCard({
+      title: objective.label,
+      subtitle: objective.tooltip ? objective.tooltip.substring(0, 100) + '...' : 'Clique para ver detalhes completos',
+      content: header,
+      footer: footer,
+      className: 'tutorial-card',
+      onClick: () => showLargeTooltip(objective),
+      hover: true
+   });
+
+   return tutorialCard;
+}
+
 // ======= UI Rendering =======
 function renderOpponents() {
    const progress = loadPlayerProgress();
@@ -183,6 +245,7 @@ function initializeHub() {
    updateOpponentUnlocks();
    renderOpponents();
    renderStats();
+   renderTutorialGrid(); // Carregar guia de combinações
 
    // Event listeners para modos de jogo
    document.querySelectorAll('.game-mode').forEach(mode => {

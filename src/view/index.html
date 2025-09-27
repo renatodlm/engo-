@@ -12,12 +12,12 @@
    style="background: radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.133), transparent), #0b1220;">
    <div class="app min-h-screen p-4">
       <!-- Header com título e botão de voltar -->
-      <header class="flex items-center justify-between mb-6">
+      <header class="relative flex items-center justify-center mb-6">
+         <button id="btnBackToHub"
+            class="absolute left-0 appearance-none border-0 bg-game-panel text-game-text-2 rounded-lg px-2 py-1.5 text-sm font-semibold cursor-pointer shadow-game transition-all duration-200 hover:bg-game-panel-2 hover:scale-105">
+            ← Sair
+         </button>
          <h1 class="text-2xl font-black text-game-text flex items-center gap-3">
-            <button id="btnBackToHub"
-               class="appearance-none border-0 bg-game-panel text-game-text-2 rounded-xl px-3 py-2 font-semibold cursor-pointer shadow-game transition-all duration-200 hover:bg-game-panel-2">
-               ← Hub
-            </button>
             Engo!
             <span class="badge text-xs px-2 py-1 rounded-full bg-game-accent-gradient text-game-bg font-bold">
                English — V1
@@ -28,123 +28,144 @@
       <!-- Container principal com grid organizado -->
       <div class="game-container grid grid-cols-1 xl:grid-cols-[300px_1fr_300px] gap-6">
 
-         <!-- Painel Esquerdo: Objetivos do Jogador -->
-         <aside class="left-panel bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game">
-            <h3 class="text-lg font-bold text-game-text mb-4 text-center">
-               🎯 Seus Objetivos
-            </h3>
-            <div id="playerCombos" class="space-y-2"></div>
-         </aside>
+         <!-- Pontuação do Jogador (acima da coluna esquerda) -->
+         <div class="xl:col-start-1 xl:col-end-2">
+            <div
+               class="bg-game-panel-gradient border border-game-border rounded-lg p-2 mb-2 text-center shadow-game relative">
+               <div
+                  class="text-xs font-bold text-green-400 bg-green-400 bg-opacity-15 px-1.5 py-0.5 rounded-full border border-green-400 border-opacity-40">
+                  🎯 VOCÊ
+               </div>
+               <div class="text-xl font-black text-game-accent" id="youScore">0</div>
+            </div>
+
+            <!-- Painel Esquerdo: Objetivos do Jogador -->
+            <aside class="left-panel bg-game-panel-gradient border border-game-border rounded-xl p-3 shadow-game">
+               <h3 class="text-xs font-bold text-game-text mb-3 opacity-80 text-left">
+                  Seus Objetivos
+               </h3>
+               <div id="playerCombos" class="space-y-1"></div>
+            </aside>
+         </div>
+
 
          <!-- Centro: Tabuleiro principal -->
-         <main class="center-panel space-y-4">
+         <main class="center-panel space-y-3">
             <!-- Painel de Informações (Rodada, Tempo, Rerolls) -->
-            <section class="info-panel bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game">
-               <div class="grid grid-cols-3 gap-4 text-center">
+            <section class="info-panel bg-game-panel-gradient border border-game-border rounded-xl p-3 shadow-game">
+               <div class="grid grid-cols-3 gap-3 text-center">
                   <div class="info-item">
-                     <div class="text-2xl font-black text-game-accent" id="round">1</div>
+                     <div class="text-xl font-black text-game-accent" id="round">1</div>
                      <div class="text-xs text-game-muted uppercase tracking-wide">Rodada</div>
                   </div>
                   <div class="info-item">
-                     <div class="text-2xl font-black text-game-text" id="rerolls">5</div>
+                     <div class="text-xl font-black text-game-text" id="rerolls">5</div>
                      <div class="text-xs text-game-muted uppercase tracking-wide">Rerolls</div>
                   </div>
                   <div class="info-item">
-                     <div class="text-2xl font-black text-game-text" id="timer">⏳ 20s</div>
+                     <div class="text-xl font-black text-game-text" id="timer">⏳ 20s</div>
                      <div class="text-xs text-game-muted uppercase tracking-wide">Tempo</div>
                   </div>
                </div>
             </section>
 
             <!-- Tabuleiro do jogo -->
-            <section class="board bg-game-panel-gradient border border-game-border rounded-2xl p-6 shadow-game">
-               <div class="mb-4">
-                  <h3 class="text-lg font-bold text-game-text mb-4 text-center">
+            <section class="board bg-game-panel-gradient border border-game-border rounded-xl p-4 shadow-game">
+               <div class="mb-3">
+                  <h3 class="text-base font-bold text-game-text mb-3 text-center">
                      🃏 Sua Mão (clique duplo para travar/destravar cartas)
                   </h3>
-                  <div class="flex items-end gap-6">
+                  <div class="flex items-end gap-4">
                      <!-- Deck virado -->
-                     <div id="deck" class="deck relative w-24 h-36 cursor-pointer transition-transform hover:scale-105">
+                     <div id="deck" class="deck relative w-28 h-40 cursor-pointer transition-transform hover:scale-105">
                         <div
-                           class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg border-2 border-blue-400 shadow-lg flex items-center justify-center">
-                           <div class="text-white text-3xl font-bold opacity-80">🎴</div>
+                           class="absolute inset-0 rounded-lg border-2 border-red-400 shadow-lg flex items-center justify-center card-back">
+                           <div class="text-white text-2xl font-bold opacity-80"></div>
                         </div>
                         <div
-                           class="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg border-2 border-blue-300 shadow-md transform rotate-2 translate-x-1 translate-y-1 flex items-center justify-center">
-                           <div class="text-white text-3xl font-bold opacity-60">🎴</div>
+                           class="absolute inset-0 rounded-lg border-2 border-red-500 shadow-md transform rotate-2 translate-x-1 translate-y-1 flex items-center justify-center card-back">
+                           <div class="text-white text-2xl font-bold opacity-60"></div>
                         </div>
                         <div
-                           class="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg border-2 border-blue-200 shadow-sm transform rotate-1 translate-x-0.5 translate-y-0.5 flex items-center justify-center">
-                           <div class="text-white text-3xl font-bold opacity-40">🎴</div>
+                           class="absolute inset-0 rounded-lg border-2 border-red-600 shadow-sm transform rotate-1 translate-x-0.5 translate-y-0.5 flex items-center justify-center card-back">
+                           <div class="text-white text-2xl font-bold opacity-40"></div>
                         </div>
                      </div>
 
                      <!-- Área das cartas -->
-                     <div id="hand" class="hand flex gap-3 min-h-[140px] items-end flex-wrap flex-1 justify-center">
+                     <div id="hand"
+                        class="hand flex gap-4 min-h-[160px] items-end flex-wrap flex-1 max-full justify-center">
                      </div>
                   </div>
                </div>
 
                <!-- Controles centralizados -->
-               <div class="controls flex justify-center gap-4">
+               <div class="controls flex justify-center gap-3">
                   <button id="btnRoll"
-                     class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-6 py-3 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                     class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-lg px-4 py-2 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-base">
                      🎲 Rolar Cartas
                   </button>
                   <button id="btnSubmit"
-                     class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-6 py-3 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-lg">
+                     class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-lg px-4 py-2 font-bold cursor-pointer shadow-game transition-all duration-200 hover:opacity-90 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-base">
                      ✅ Enviar Mão
                   </button>
                </div>
+
             </section>
 
-            <!-- Pontuações -->
-            <section class="scores bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game">
-               <div class="grid grid-cols-2 gap-4">
-                  <div class="score text-center">
-                     <h3 class="text-lg font-bold text-game-text mb-2">Você</h3>
-                     <div class="text-3xl font-black text-game-good" id="youScore">0</div>
-                  </div>
-                  <div class="score text-center">
-                     <h3 class="text-lg font-bold text-game-text mb-2">Oponente</h3>
-                     <div class="text-3xl font-black text-game-bad" id="botScore">0</div>
-                  </div>
+            <!-- Log de Movimentos Centralizado -->
+            <section class="bg-game-panel-gradient border border-game-border rounded-xl p-3 shadow-game">
+               <div class="game-log-header mb-2">
+                  <h3 class="game-log-title text-xs font-bold text-game-text text-center opacity-80">📝 Movimentos</h3>
+               </div>
+               <div class="game-log-entries max-h-48 overflow-y-scroll" id="gameLog">
+                  <!-- Log da partida será adicionado aqui dinamicamente -->
                </div>
             </section>
          </main>
 
-         <!-- Painel Direito: Objetivos do Oponente e Configurações -->
-         <aside
-            class="right-panel bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game space-y-4">
-            <div>
-               <h3 class="text-lg font-bold text-game-text mb-4 text-center">
-                  🤖 Objetivos do Oponente
-               </h3>
-               <div id="opponentCombos" class="space-y-2"></div>
+         <!-- Pontuação do Oponente (acima da coluna direita) -->
+         <div class="xl:col-start-3 xl:col-end-4">
+            <div
+               class="bg-game-panel-gradient border border-game-border rounded-lg p-2 mb-2 text-center shadow-game relative">
+               <div
+                  class="text-xs font-bold text-red-400 bg-red-400 bg-opacity-15 px-1.5 py-0.5 rounded-full border border-red-400 border-opacity-40">
+                  🤖 OPONENTE
+               </div>
+               <div class="text-xl font-black text-red-400" id="botScore">0</div>
             </div>
 
-            <div class="border-t border-game-border pt-4">
-               <h3 class="text-lg font-bold text-game-text mb-4 text-center">
-                  ⚙️ Configurações
-               </h3>
-               <div class="space-y-3">
-                  <div>
-                     <label class="block text-sm font-medium text-game-muted mb-1">Nível</label>
-                     <select id="level"
-                        class="btn appearance-none border-0 bg-game-btn-gradient text-game-text-4 rounded-xl px-4 py-2 font-bold cursor-pointer shadow-game w-full">
-                        <option value="A1">A1 (Iniciante)</option>
-                        <option value="A2" selected>A2</option>
-                        <option value="B1">B1</option>
-                        <option value="B2">B2</option>
-                        <option value="C1">C1</option>
-                     </select>
+            <!-- Painel Direito: Objetivos do Oponente e Configurações -->
+            <aside
+               class="right-panel bg-game-panel-gradient border border-game-border rounded-xl p-3 shadow-game space-y-3">
+               <div>
+                  <h3 class="text-xs font-bold text-game-text mb-3 opacity-80 text-right">
+                     Objetivos do Oponente
+                  </h3>
+                  <div id="opponentCombos" class="space-y-1"></div>
+               </div>
+
+               <div class="border-t border-game-border pt-3">
+                  <div class="space-y-2">
+                     <div>
+                        <label class="block text-xs font-medium text-game-muted mb-1">Nível de Dificuldade</label>
+                        <div class="custom-select">
+                           <select id="level">
+                              <option value="A1">A1 (Iniciante)</option>
+                              <option value="A2" selected>A2 (Básico)</option>
+                              <option value="B1">B1 (Intermediário)</option>
+                              <option value="B2">B2 (Avançado)</option>
+                              <option value="C1">C1 (Fluente)</option>
+                           </select>
+                        </div>
+                     </div>
                   </div>
                </div>
-            </div>
-         </aside>
+            </aside>
+         </div>
+
       </div>
    </div>
-
    <script src="src/js/gameData.js"></script>
    <script src="src/js/gameLogic.js"></script>
 </body>

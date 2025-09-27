@@ -2,6 +2,17 @@
 module.exports = {
    content: ["./src/**/*.html", "./dist/**/*.html", "./*.html", "./src/**/*.js", "./dist/**/*.js", "./*.js"],
    theme: {
+      borderRadius: {
+         'none': '0',
+         'sm': '0.25rem',
+         DEFAULT: '0.375rem',
+         'md': '0.375rem',
+         'lg': '0.5rem',
+         'xl': '0.75rem',
+         '2xl': '1rem',
+         '3xl': '1.5rem',
+         'full': '9999px',
+      },
       extend: {
          colors: {
             'game-bg': '#0b1220',
@@ -52,18 +63,23 @@ module.exports = {
                '100%': { transform: 'rotateY(0deg) scale(1)' }
             },
             cardDraw: {
-               '0%': { transform: 'rotateY(180deg) scale(0.8) rotateZ(5deg)', opacity: '0.8' },
-               '50%': { transform: 'rotateY(90deg) scale(0.95) rotateZ(2deg)', opacity: '0.9' },
-               '100%': { transform: 'rotateY(0deg) scale(1) rotateZ(0deg)', opacity: '1' }
+               '0%': { transform: 'rotateY(180deg) scale(0.8) translateY(-20px) rotateZ(8deg)', opacity: '0.7' },
+               '30%': { transform: 'rotateY(135deg) scale(0.9) translateY(-10px) rotateZ(4deg)', opacity: '0.85' },
+               '60%': { transform: 'rotateY(90deg) scale(0.95) translateY(-5px) rotateZ(2deg)', opacity: '0.9' },
+               '80%': { transform: 'rotateY(45deg) scale(0.98) translateY(-2px) rotateZ(1deg)', opacity: '0.95' },
+               '100%': { transform: 'rotateY(0deg) scale(1) translateY(0px) rotateZ(0deg)', opacity: '1' }
             }
          },
          backgroundImage: {
-            'game-gradient': 'radial-gradient(1200px 700px at 20% -10%, #1b2a56, transparent), radial-gradient(900px 500px at 90% 0, rgba(58, 29, 106, 0.4), transparent)',
-            'game-panel-gradient': 'linear-gradient(180deg, #111a2e, #0f1830), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005))',
-            'game-card-gradient': 'linear-gradient(180deg, #213057, #162346)',
-            'game-btn-gradient': 'linear-gradient(180deg, #2a3a72, #1a2550)',
+            'game-gradient': 'linear-gradient(135deg, rgba(27, 42, 86, 0.3), rgba(15, 24, 48, 0.8))',
+            'game-panel-gradient': 'linear-gradient(180deg, rgba(17, 26, 46, 0.9), rgba(15, 24, 48, 0.95))',
+            'game-card-gradient': 'linear-gradient(180deg, rgba(33, 48, 87, 0.9), rgba(22, 35, 70, 0.95))',
+            'game-btn-gradient': 'linear-gradient(180deg, rgba(42, 58, 114, 0.9), rgba(26, 37, 80, 0.95))',
             'game-accent-gradient': 'linear-gradient(90deg, #6ee7ff, #a78bfa)',
-            'game-progress-gradient': 'linear-gradient(90deg, #6ee7ff, #a78bfa)',
+            'game-progress-gradient': 'linear-gradient(90deg, rgba(110, 231, 255, 0.8), rgba(167, 139, 250, 0.8))',
+            'game-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+            'player-area': 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.03))',
+            'opponent-area': 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.03))',
          }
       },
    },

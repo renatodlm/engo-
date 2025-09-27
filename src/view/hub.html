@@ -69,6 +69,25 @@
          </section>
       </div>
 
+      <!-- Tutorial e Guia de Combinações -->
+      <section
+         class="bg-game-panel-gradient border border-game-border rounded-2xl p-6 shadow-game mt-8 max-w-6xl mx-auto w-full">
+         <h2 class="text-3xl font-bold text-game-text mb-6 text-center">
+            📚 Como Jogar - Guia de Combinações
+         </h2>
+
+         <div class="mb-6 text-center">
+            <p class="text-game-muted text-lg">
+               Aprenda todas as combinações possíveis e como formar cada objetivo. Passe o mouse sobre cada combinação
+               para ver detalhes e vídeos tutoriais.
+            </p>
+         </div>
+
+         <div id="tutorialGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- As combinações serão carregadas dinamicamente -->
+         </div>
+      </section>
+
       <!-- Estatísticas do Jogador -->
       <section
          class="bg-game-panel-gradient border border-game-border rounded-2xl p-4 shadow-game mt-8 max-w-4xl mx-auto w-full">
@@ -98,6 +117,7 @@
    </div>
 
    <script src="src/js/gameData.js"></script>
+   <script src="src/js/gameLogic.js"></script>
    <script src="src/js/hubLogic.js"></script>
 </body>
 

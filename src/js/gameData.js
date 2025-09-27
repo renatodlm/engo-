@@ -135,90 +135,122 @@ const POS_LABEL = {
    pron: 'Pronome'
 };
 
-// Objectives by difficulty. Each item: id, label, requirement(hand)=>{ok:boolean, progress:0..1, weight:int}
+const POS_COLORS = {
+   noun: { bg: '#ef4444', text: '#ffffff' },       // Vermelho - Substantivos
+   verb: { bg: '#3b82f6', text: '#ffffff' },       // Azul - Verbos
+   adj: { bg: '#f59e0b', text: '#ffffff' },        // Laranja - Adjetivos
+   adv: { bg: '#10b981', text: '#ffffff' },        // Verde - Advérbios
+   prep: { bg: '#8b5cf6', text: '#ffffff' },       // Roxo - Preposições
+   pron: { bg: '#f97316', text: '#ffffff' },       // Laranja escuro - Pronomes
+   conj: { bg: '#06b6d4', text: '#ffffff' },       // Ciano - Conjunções
+   interjection: { bg: '#ec4899', text: '#ffffff' } // Pink - Interjeições
+};
+
+// Sistema de Pontuação Exponencial
+const EXPONENTIAL_POINTS = {
+   0: 0, 1: 0, 2: 2, 3: 4, 4: 8, 5: 16
+};
+
+function calculateExponentialPoints(count) {
+   return EXPONENTIAL_POINTS[Math.min(count, 5)] || 0;
+}
+
+// Objectives baseados em quantidade máxima com pontuação exponencial
 const OBJECTIVES = [
-   // A1-A2
+   // Objetivos por tipo gramatical - todos níveis
    {
-      id: 'pair-verbs',
-      levels: ['A1', 'A2'],
-      label: '2 Verbos',
-      weight: 1,
-      tooltip: 'Colete 2 cartas de verbos (palavras de ação como "correr", "comer", etc.)',
-      req: (h) => count(h, 'verb') >= 2,
-      prog: (h) => Math.min(count(h, 'verb') / 2, 1)
+      id: 'verb-collection',
+      levels: ['A1', 'A2', 'B1', 'B2', 'C1'],
+      label: 'Coleção de Verbos',
+      type: 'verb',
+      tooltip: 'Colete o máximo de verbos possível! Pontuação: 2 verbos = 2pts, 3 verbos = 4pts, 4 verbos = 8pts, 5 verbos = 16pts',
+      videoUrl: 'tutorial-verbos.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'verb')),
+      prog: (h) => count(h, 'verb') / 5
    },
    {
-      id: 'pair-nouns',
-      levels: ['A1', 'A2'],
-      label: '2 Substantivos',
-      weight: 1,
-      tooltip: 'Colete 2 cartas de substantivos (coisas, pessoas, lugares como "casa", "gato", etc.)',
-      req: (h) => count(h, 'noun') >= 2,
-      prog: (h) => Math.min(count(h, 'noun') / 2, 1)
+      id: 'noun-collection',
+      levels: ['A1', 'A2', 'B1', 'B2', 'C1'],
+      label: 'Coleção de Substantivos',
+      type: 'noun',
+      tooltip: 'Colete o máximo de substantivos possível! Pontuação: 2 substantivos = 2pts, 3 substantivos = 4pts, 4 substantivos = 8pts, 5 substantivos = 16pts',
+      videoUrl: 'tutorial-substantivos.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'noun')),
+      prog: (h) => count(h, 'noun') / 5
    },
    {
-      id: 'verb+noun',
-      levels: ['A1', 'A2', 'B1'],
-      label: 'Verbo + Substantivo',
-      weight: 1,
-      tooltip: 'Tenha pelo menos 1 verbo e 1 substantivo juntos. Base de uma frase simples!',
-      req: (h) => count(h, 'verb') >= 1 && count(h, 'noun') >= 1,
-      prog: (h) => Math.min(((count(h, 'verb') > 0 ? 1 : 0) + (count(h, 'noun') > 0 ? 1 : 0)) / 2, 1)
+      id: 'adj-collection',
+      levels: ['A1', 'A2', 'B1', 'B2', 'C1'],
+      label: 'Coleção de Adjetivos',
+      type: 'adj',
+      tooltip: 'Colete o máximo de adjetivos possível! Pontuação: 2 adjetivos = 2pts, 3 adjetivos = 4pts, 4 adjetivos = 8pts, 5 adjetivos = 16pts',
+      videoUrl: 'tutorial-adjetivos.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'adj')),
+      prog: (h) => count(h, 'adj') / 5
    },
    {
-      id: 'three-same',
-      levels: ['A2', 'B1'],
-      label: '3 do mesmo tipo',
-      weight: 2,
-      tooltip: 'Colete 3 cartas do mesmo tipo gramatical (ex: 3 verbos ou 3 adjetivos)',
-      req: (h) => hasAtLeast(h, 3),
-      prog: (h) => Math.min(bestOfSame(h) / 3, 1)
-   },
-   // B1-B2
-   {
-      id: 'four-same',
-      levels: ['B1', 'B2'],
-      label: '4 do mesmo tipo',
-      weight: 3,
-      tooltip: 'Desafio maior: colete 4 cartas do mesmo tipo gramatical!',
-      req: (h) => hasAtLeast(h, 4),
-      prog: (h) => Math.min(bestOfSame(h) / 4, 1)
+      id: 'adv-collection',
+      levels: ['A2', 'B1', 'B2', 'C1'],
+      label: 'Coleção de Advérbios',
+      type: 'adv',
+      tooltip: 'Colete o máximo de advérbios possível! Pontuação: 2 advérbios = 2pts, 3 advérbios = 4pts, 4 advérbios = 8pts, 5 advérbios = 16pts',
+      videoUrl: 'tutorial-adverbios.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'adv')),
+      prog: (h) => count(h, 'adv') / 5
    },
    {
-      id: 'svo',
+      id: 'prep-collection',
       levels: ['B1', 'B2', 'C1'],
-      label: 'Sujeito + Verbo + Objeto',
-      weight: 3,
-      tooltip: 'Monte uma frase completa: 1 verbo + 2 substantivos (um como sujeito, outro como objeto)',
-      req: (h) => count(h, 'verb') >= 1 && count(h, 'noun') >= 2,
-      prog: (h) => Math.min((Math.min(count(h, 'verb'), 1) + Math.min(count(h, 'noun'), 2)) / 3, 1)
+      label: 'Coleção de Preposições',
+      type: 'prep',
+      tooltip: 'Colete o máximo de preposições possível! Pontuação: 2 preposições = 2pts, 3 preposições = 4pts, 4 preposições = 8pts, 5 preposições = 16pts',
+      videoUrl: 'tutorial-preposicoes.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'prep')),
+      prog: (h) => count(h, 'prep') / 5
    },
    {
-      id: 'prep-pair',
-      levels: ['B1', 'B2'],
-      label: '2 Preposições',
-      weight: 2,
-      tooltip: 'Colete 2 preposições (palavras que conectam como "em", "sobre", "com", etc.)',
-      req: (h) => count(h, 'prep') >= 2,
-      prog: (h) => Math.min(count(h, 'prep') / 2, 1)
+      id: 'pron-collection',
+      levels: ['A1', 'A2', 'B1', 'B2', 'C1'],
+      label: 'Coleção de Pronomes',
+      type: 'pron',
+      tooltip: 'Colete o máximo de pronomes possível! Pontuação: 2 pronomes = 2pts, 3 pronomes = 4pts, 4 pronomes = 8pts, 5 pronomes = 16pts',
+      videoUrl: 'tutorial-pronomes.mp4',
+      calculate: (h) => calculateExponentialPoints(count(h, 'pron')),
+      prog: (h) => count(h, 'pron') / 5
    },
-   // C1
+   // Objetivos especiais avançados
    {
-      id: 'full-house',
+      id: 'perfect-collection',
       levels: ['C1'],
-      label: 'Full House (3+2 POS)',
-      weight: 4,
-      tooltip: 'Como no poker: 3 cartas de um tipo + 2 cartas de outro tipo (ex: 3 verbos + 2 substantivos)',
-      req: (h) => isFullHouse(h),
-      prog: (h) => fullHouseProg(h)
+      label: 'Coleção Perfeita',
+      type: 'special',
+      tooltip: 'O desafio supremo: colete 5 cartas do mesmo tipo! Recompensa máxima de 16 pontos.',
+      videoUrl: 'tutorial-colecao-perfeita.mp4',
+      calculate: (h) => {
+         const counts = ['verb', 'noun', 'adj', 'adv', 'prep', 'pron'].map(type => count(h, type));
+         const maxCount = Math.max(...counts);
+         return maxCount === 5 ? 16 : 0;
+      },
+      prog: (h) => {
+         const counts = ['verb', 'noun', 'adj', 'adv', 'prep', 'pron'].map(type => count(h, type));
+         const maxCount = Math.max(...counts);
+         return maxCount / 5;
+      }
    },
    {
-      id: 'rainbow',
-      levels: ['C1'],
-      label: 'Arco-íris (5 tipos diferentes)',
-      weight: 5,
-      tooltip: 'Desafio supremo: tenha pelo menos 1 carta de 5 tipos gramaticais diferentes!',
-      req: (h) => distinctPOS(h) >= 5,
+      id: 'diversity-bonus',
+      levels: ['B2', 'C1'],
+      label: 'Bônus de Diversidade',
+      type: 'special',
+      tooltip: 'Tenha pelo menos 1 carta de diferentes tipos. Pontuação baseada na variedade: 3 tipos = 4pts, 4 tipos = 8pts, 5+ tipos = 16pts',
+      videoUrl: 'tutorial-diversidade.mp4',
+      calculate: (h) => {
+         const distinctTypes = distinctPOS(h);
+         if (distinctTypes >= 5) return 16;
+         if (distinctTypes >= 4) return 8;
+         if (distinctTypes >= 3) return 4;
+         return 0;
+      },
       prog: (h) => Math.min(distinctPOS(h) / 5, 1)
    }
 ];
@@ -234,5 +266,8 @@ const GAME_CONFIG = {
 // Export for use in other modules
 window.WORDS = WORDS;
 window.POS_LABEL = POS_LABEL;
+window.POS_COLORS = POS_COLORS;
 window.OBJECTIVES = OBJECTIVES;
 window.GAME_CONFIG = GAME_CONFIG;
+window.EXPONENTIAL_POINTS = EXPONENTIAL_POINTS;
+window.calculateExponentialPoints = calculateExponentialPoints;
